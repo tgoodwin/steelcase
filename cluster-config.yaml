@@ -1,0 +1,20 @@
+# a sample multi-node cluster config file
+# a four node, one controller cluster config
+# to add more worker ndoes, add another `role: worker` to the list
+#
+# https://knative.dev/blog/articles/set-up-a-local-knative-environment-with-kind/
+
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+- role: control-plane
+  extraPortMappings:
+    ## expose port 31380 of the node to port 80 on the host
+  - containerPort: 31080
+    hostPort: 80
+    ## expose port 31443 of the node to port 443 on the host
+  - containerPort: 31443
+    hostPort: 443
+- role: worker
+- role: worker
+
