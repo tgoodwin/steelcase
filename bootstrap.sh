@@ -10,7 +10,7 @@ kind create cluster --name $K8s_CLUSTER_NAME --config cluster-config.yaml
 # install knative serving from source
 echo "installing knative from source at ${KNATIVE_SERVING_REPO}"
 cd $KNATIVE_SERVING_REPO
-ls
+
 # install CRDs
 ko apply --selector knative.dev/crd-install=true -Rf config/core/
 kubectl wait --for=condition=Established --all crd
