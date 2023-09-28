@@ -1,11 +1,26 @@
 #!/bin/bash
 
+set -euxo pipefail
+
+
 K8s_CLUSTER_NAME="steelcase";
 KNATIVE_SERVING_REPO="${HOME}/knative-serving"
 
+function cleanup() {
+    kind delete cluster --name $K8S_CLUSTER_NAME
+
+    cd $KNATIVE_SERVING_REPO
+    ko delete --ignore-not-found=true \
+        -Rf config/core/ \
+        -f ./thord_party/kourier-latest/kourier.yaml \
+        -f ./third_party/cert-manager-latest/cert-manager.yaml
+}
+
 # create cluster from config file
-echo "creating cluster..."
-kind create cluster --name $K8s_CLUSTER_NAME --config cluster-config.yaml
+if [[ $(kind get clusters) != $K8s_CLUSTER_NAME ]]; then
+    echo "creating cluster..."
+    kind create cluster --name $K8s_CLUSTER_NAME --config cluster-config.yaml
+fi
 
 # install knative serving from source
 echo "installing knative from source at ${KNATIVE_SERVING_REPO}"
