@@ -1,0 +1,10 @@
+#! /bin/bash
+
+# forwards etcdctl commands to the client on the control plane node
+# so that we can interact with  the etcd cluster that kind is running
+# NOTE: must run bootstrap.sh to install etcdctl on the control plane node before using this script.
+
+CERTPATH="/etc/kubernetes/pki/etcd"
+docker exec kind-control-plane /bin/sh -c "ETCDCTL_API=3 etcdctl --cacert $CERTPATH/ca.crt  --cert $CERTPATH/healthcheck-client.crt  --key $CERTPATH/healthcheck-client.key ${*}"
+
+
