@@ -8,6 +8,7 @@ kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
 nodes:
 - role: control-plane
+  # Kourier networking stuff
   extraPortMappings:
     ## expose port 31380 of the node to port 80 on the host
   - containerPort: 31080
@@ -15,7 +16,31 @@ nodes:
     ## expose port 31443 of the node to port 443 on the host
   - containerPort: 31443
     hostPort: 443
-- role: worker
+  # for recording events
+  extraMounts:
+    - hostPath: /Users/tgoodwin/steelcase/audit-policy.yaml
+      containerPath: /etc/kubernetes/audit-policy.yaml
+    - hostPath: /Users/tgoodwin/steelcase/audit-webhook-config.yaml
+      containerPath: /etc/kubernetes/audit-webhook-config.yaml
+    - hostPath: /Users/tgoodwin/steelcase/audit_logs/
+      containerPath: /var/log/apiserver/
+  kubeadmConfigPatches:
+  - |
+    kind: ClusterConfiguration
+    apiServer:
+      extraArgs:
+        audit-policy-file: /etc/kubernetes/audit-policy.yaml
+        audit-log-path: /var/log/apiserver/audit.log
+      extraVolumes:
+      - name: audit-policy
+        hostPath: /etc/kubernetes/audit-policy.yaml
+        mountPath: /etc/kubernetes/audit-policy.yaml
+        readOnly: true
+      - name: audit-log
+        hostPath: /var/log/apiserver/
+        mountPath: /var/log/apiserver/
+        readOnly: false
+
 - role: worker
 - role: worker
 - role: worker
