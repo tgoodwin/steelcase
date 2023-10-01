@@ -3,7 +3,7 @@
 set -euxo pipefail
 
 
-K8s_CLUSTER_NAME="steelcase";
+K8s_CLUSTER_NAME=$CLUSTER_NAME || "sleeveless";
 KNATIVE_SERVING_REPO="${HOME}/knative-serving"
 
 function cleanup() {
@@ -17,7 +17,7 @@ function cleanup() {
 }
 
 # create cluster from config file
-if [[ $(kind get clusters) != $K8s_CLUSTER_NAME ]]; then
+if [[ $(kind get clusters | grep $K8s_CLUSTER_NAME) != $K8s_CLUSTER_NAME ]]; then
     echo "creating cluster..."
     kind create cluster --name $K8s_CLUSTER_NAME --config cluster-config.yaml
 fi
